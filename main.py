@@ -6,8 +6,25 @@ from udf_utils import *
 
 def define_udfs():
     return {
-        'extract_file_name_udf':udf(extract_file_name,StringType()),
-        
+        'extract_file_name_udf': udf(extract_file_name, StringType()),
+        'extract_position_udf': udf(extract_position, StringType()),
+        'extract_salary_udf': udf(
+            extract_salary, 
+            StructType([
+                StructField('salary_start', DoubleType(), nullable=True),
+                StructField('salary_end', DoubleType(), nullable=True)
+            ])
+        ),
+        'extract_date_udf': udf(extract_start_date, DateType()),
+        'extract_enddate_udf': udf(extract_end_date, DateType()),
+        'extract_classcode_udf': udf(extract_class_code, StringType()),
+        'extract_requirements_udf': udf(extract_requirements, StringType()),
+        'extract_notes_udf': udf(extract_notes, StringType()),
+        'extract_duties_udf': udf(extract_duties, StringType()),
+        'extract_selection_udf': udf(extract_selection, StringType()),
+        'extract_experience_length_udf': udf(extract_experience_length, StringType()),
+        'extract_education_length_udf': udf(extract_education_length, StringType()),
+        'extract_application_location_udf': udf(extract_application_location, StringType())
     }
 
 if __name__=="__main__":
@@ -32,7 +49,7 @@ if __name__=="__main__":
 # Now you can use the spark session to access data from AWS S3
 
     data_schema = StructType([
-        StructField("file_name", StringType(), True),
+        StructField("file_name", StringType(),True),
         StructField("position", StringType(), True),
         StructField("classcode", StringType(), True),
         StructField("salary_start", DoubleType(), True),
@@ -50,3 +67,11 @@ if __name__=="__main__":
         StructField("application_location", StringType(), True),
         
     ])
+    
+    udfs=define_udfs()
+    
+    job_bulletins_df = (spark.readStream
+                    .format('text')
+                    .option('wholetext', 'true')
+                    .load(text_input_dir)
+                   )
